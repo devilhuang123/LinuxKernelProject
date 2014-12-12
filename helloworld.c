@@ -31,7 +31,7 @@ asmlinkage int sys_project(long pid)
 
 	mm_s=task->mm;
 	vm_a_s=mm_s->mmap;
-	for(vm_a_s2=vm_a_s;vm_a_s2->vm_next!=NULL;vm_a_s2=vm_a_s2->vm_next)
+	for(vm_a_s2=vm_a_s;vm_a_s2!=NULL;vm_a_s2=vm_a_s2->vm_next)
 	{
 		unsigned long int vm_start,vm_end;
 		vm_start=vm_a_s2->vm_start;
@@ -45,15 +45,20 @@ asmlinkage int sys_project(long pid)
 
 		pgd= pgd_offset(mm_s,vm_start);
 		if(pgd_none(*pgd)||pgd_bad(*pgd)){break;}
+//		printk("pgd= %lx,",pgd);
 		pud= pud_offset(pgd,vm_start);
 		if(pud_none(*pud)||pud_bad(*pud)){break;}
+//		printk("pud= %lx,",pud);
 		pmd= pmd_offset(pud,vm_start);
 		if(pmd_none(*pmd)||pmd_bad(*pmd)){break;}
+//		printk("pmd= %lx,",pmd);
 		ptep=pte_offset_kernel(pmd,vm_start);
 		if(pte_none(*ptep)){break;}
-		pte=*ptep;
-		page=pte_page(pte);			
-		if(page){printk("page start:%p ",page);}
+		printk("pte= %lx ",pte_val(pte)>>12);
+		
+		//pte=*ptep;
+		//page=pte_page(pte);			
+		//if(page){printk("page start:%p ",page);}
 
 		if(vm_a_s2->vm_file!=NULL)
 		{	
